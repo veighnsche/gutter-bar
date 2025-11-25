@@ -13,24 +13,32 @@ use gtk4::{
     Application, ApplicationWindow, Box as GtkBox, CssProvider, Orientation,
     STYLE_PROVIDER_PRIORITY_APPLICATION,
 };
-use state::GutterState;
+use state::{GutterState, ViewMode};
 use std::cell::RefCell;
 use std::rc::Rc;
 use views::update_view;
 
 fn main() {
+    env_logger::init();
     let cli = Cli::parse();
 
     match cli.command {
         Commands::Daemon => {
             daemon::start();
         }
-        Commands::View => {
+        Commands::View { mode } => {
             let app = Application::builder()
                 .application_id("com.veighnsche.gutter-bar")
                 .build();
 
-            let state = Rc::new(RefCell::new(GutterState::new()));
+            let view_mode = match mode.as_deref() {
+                Some("active") => ViewMode::Active,
+                Some("divider") => ViewMode::Divider,
+                Some("sidebar") => ViewMode::Sidebar,
+                _ => ViewMode::Default,
+            };
+
+            let state = Rc::new(RefCell::new(GutterState::new(view_mode)));
 
             app.connect_activate(move |app| {
                 build_ui(app, state.clone());

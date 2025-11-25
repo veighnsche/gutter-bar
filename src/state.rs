@@ -15,11 +15,24 @@ pub struct GutterState {
 }
 
 impl GutterState {
-    pub fn new() -> Self {
+    pub fn new(mode: ViewMode) -> Self {
         Self {
-            mode: ViewMode::Default,
+            mode,
             window: None,
             root_box: None,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_initial_state() {
+        let state = GutterState::new(ViewMode::Default);
+        assert_eq!(state.mode, ViewMode::Default);
+        assert!(state.window.is_none());
+        assert!(state.root_box.is_none());
     }
 }
